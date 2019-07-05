@@ -1,0 +1,25 @@
+@startuml
+
+AcquirerBank -> PaymentSystem:RestCall
+PaymentSystem -> AcquirerBank:Token
+PaymentSystem -> MongoDB: Save Token and Secure key in database
+AcquirerBank -> MongoDB:Token
+AcquirerBank <-- MongoDB:Retrieve Securekey
+AcquirerBank --> AcquirerBank:Encrypt Data using Secure key
+AcquirerBank -> MongoDB: Store Encrypted data in the MongoDB
+AcquirerBank <-- MongoDB:Retrieve Token
+AcquirerBank -> PaymentSystem:Send Token ID for Encrypted data
+
+PaymentSystem-> IssuerBank:RestCall with Network
+PaymentSystem<--IssuerBank: Rest call to retrieve Token
+PaymentSystem->IssuerBank:Get the Token
+
+MongoDB<--IssuerBank: Retrieve Secure key and data from the MongoDB database
+MongoDB->IssuerBank:Send the SecureKey and Encrypted data
+
+IssuerBank->IssuerBank:Decrypt the data
+IssuerBank->MongoDB: Verify the User details from the Database
+IssuerBank->PaymentSystem:Return Approve or Decline depending on the user credentials
+
+
+@enduml
